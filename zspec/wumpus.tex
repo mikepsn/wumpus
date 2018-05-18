@@ -1,0 +1,222 @@
+\documentclass[a4paper]{article}
+%\usepackage{a4wide}
+\usepackage{oz}
+\usepackage[final]{nips_2017}
+
+\title{Wumpus World Formal Specification}
+\author{Michael Papasimeon}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+This article describes a very (incomplete) formal specification of the Wumpus world game.
+The specification is defined in the Z language. The purpose of the
+specification is to formally define different types of interactions
+between the the environment in which the Wumpus lives in, and the way it
+interacts with an agent that is situated in this environment.
+
+\section{Definitions and Utility Functions}
+A function $uniform$ is defined that returns a uniform random number
+between $x$ and $y$.
+\begin{axdef}
+	uniform : \nat \cross \nat \tfun \real 
+\ST
+	\forall x,y : \nat | y \geqslant x 
+		\dot x \leqslant uniform(x,y) \leqslant y
+\end{axdef}
+
+A function $random$ is defined that returns a random natural number in
+the range specified by the parameters to the function.
+\begin{axdef}
+	random : \natone \cross \natone \tfun \natone
+\ST
+	\forall x,y : \natone | y \geqslant x 
+		\dot random(x,y) \in x..y
+\end{axdef}
+
+\section{Agent}
+This section defines the details of the Hunter Agent which explores the
+cave world in the hope of finding the hidden treasure. The cave
+environment in which the Hunter Agent is situated in has a number of
+threats, including a number of bottomless pits and a monster called the
+wumpus.
+
+The Hunter Agent can only travel from room to room in the cave in
+certain directions. He can travel only up or down and left or right. The
+agent cannot travel or move diagonally.
+\begin{zed}
+	DIRECTION ::= Up | Down | Left | Right
+\end{zed}
+
+The agent can receive a predefined number of percepts from the
+environment, while in any given room of the cave.
+\begin{description}
+	\item[Stench] If the agent smells a stench, indicates that the wumpus 
+	is one of the adjacent rooms (not diagonally).
+	\item[Breeze] If the agent feels a breeze, this indicates that there
+	is pit in one of the adjacent caves (not diagonally).
+	\item[Glitter] If the agent sees glitter, then the agent has found
+	the gold in the current room.
+	\item[Bump] If the agent perceives a bump that means it has hit the
+	wall of the cave and cannot travel further in the direction he was
+	travelling in.
+	\item[Scream] If the agent hears a scream, this means that the
+	wumpus has been killed and any further stench can be ignored.
+\end{description}
+\begin{zed}
+	PERCEPT ::= Stench | Breeze | Glitter | Bump | Scream
+\end{zed}
+
+The Hunter Agent only has five different types of actions available to
+him. He can either travel one room forward, turn left or right, shoot a
+single arrow in the direction the agent is facing, or climb out of the
+cave. The agent only has a single arrow available. If he shoots the
+arrow it flies in the direction in which the agent was facing until it
+hits the wall of the cave or until it hits the wumpus. If it hits the
+wumpus, the wumpus is killed. The agent can only climb out of the cave
+if there is an opening in the room. In this scenario, the only opening
+will be in the room in which the agent entered the cave; that is the
+start room.
+\begin{zed}
+	ACTION ::= Forward | TurnRight | TurnLeft | Shoot | Climb
+\end{zed}
+
+The agent schema has a sequence of $PERCEPT$ representing a list of the
+percepts the agent is currently perceiving (while in the current
+location). Similarly, the schema also has sequence of $ACTION$ to
+indicate the actions that it whishes to perform this time step.
+The schema indicates that the agent has two basic beliefs about the
+world. Firstly, it knows if it is alive, and secondly it knows if it has
+shot the arrow it starts out with. Note that the agent doesn't know
+anything about it's current position in the cave. In this particular
+case the agent isn't storing it's own local coordinates, but it still
+doesn't know about the cave's global coordinate system.
+
+\begin{schema}{Agent}
+	percepts : \seq PERCEPT \\
+	actions : \seq ACTION \\
+	alive : \bool \\
+	shotArrow : \bool
+%\where
+\end{schema}
+
+When the agent is initialised it has no percepts and no actions to
+perform (and hence the empty sequences). It also knows that it is alive
+and that it has yet to shoot the arrow it has.
+\begin{schema}{AgentInit}
+	\Delta Agent \\
+\where
+	percepts' = \emptyseq \\
+	actions' = \emptyseq \\
+	alive' = \true \\
+	shotArrow' = \false
+\end{schema}
+
+\section{Wumpus}
+All the wumpus knows in the wumpus schema is, if it is alive or not.
+
+\begin{schema}{Wumpus}
+	alive : \bool
+\end{schema}
+
+When the wumpus is initialised it knows it is alive.
+
+\begin{schema}{InitWumpus}
+	\Delta Wumpus
+\where
+	alive' = \true
+\end{schema}
+
+\section{Environment}
+In this section the environment in which the wumpus and the agent are
+situated in is defined. The cave is represented as a two dimensional
+grid of rooms. Therefore, and particular room can be defined by its
+position in the grid by a tuple representing the grid coordinates.
+A $ROOM$ is defined by its position coordinates, which is a relation
+between two natural numbers greater than one. Each room can then be
+refered to as a row/column tuple pair.
+\begin{zed}
+	ROOM == \natone \rel \natone
+\end{zed}
+
+One particular room is special in the cave. That is the entrance. The
+entrance is special because the agent can climb into and climb out of
+the cave only when at the entrance. The entrance is defined as the first
+row/column pair in the cave $(1,1)$ or $\{1\map1\}$.
+\begin{axdef}
+	entrance : ROOM
+\ST
+	entrance = \{ 1 \map 1 \}
+\end{axdef}
+
+The cave schema defines the cave firstly by the number of rows and
+columns it has. This indirectly defines the number of rooms in the cave.
+A finite subset of these rooms will have bottomless pits in them. 
+It is not possible for there to be a pit in the entrance room.
+The gold will be located in a room in the cave. The wumpus will
+also be located in a single room. It is entirely possible that wumpus
+and the gold are in the same room. The cave also contains the hunter
+agent. The cave schema also keeps track of the agent's location and the
+direction it is facing.
+
+\begin{schema}{Cave}
+	numRows : \natone \\
+	numColumns : \natone \\
+	pits : \fset ROOM  \\
+	gold : \fsetone ROOM \\
+	wumpus : \fsetone ROOM \\
+	agentLocation : \fsetone ROOM \\
+	agentDirection : DIRECTION \\
+	agent : Agent
+\where
+	\#pits \leqslant numRows * numColumns \\
+	\dom pits \subs 1..numRows \\
+	\ran pits \subs 1..numColumns \\
+	entrance \notin pits \\
+	\dom gold \subs 1..numRows \\
+	\ran gold \subs 1..numColumns \\
+	\#gold = 1 \\
+	\#wumpus = 1 \\
+	\dom wumpus \subs 1..numRows \\
+	\dom wumpus \subs 1..numColumns \\
+	\dom agentLocation \subs 1..numRows \\
+	\ran agentLocation \subs 1..numColumns \\
+\end{schema}
+
+The cave is initialised using three parameters. Firstly the number of
+rows and the columns in the cave is set, followed by the probability
+that there is a pit in any given room. The cave initialisation schema
+also places random pits in the cave, and also randomly places the wumpus
+and the gold. It is entirely possible that the gold ends up in a
+bottomless pit, in which case it is impossible for the agent to succeed
+at its mission. It is also possible for the gold and the wumpus to end
+up in the same room.
+
+\begin{schema}{InitCave}
+	\Delta Cave \\
+	n?, m? : \natone \\
+	pitChance? : \real
+\where
+	numRows' = n? \\
+	numColumns' = m? \\
+	0.0 \leqslant pitChance? \leqslant 1.0 \\
+	\forall i,j : \natone | \\
+	\t1	i \in 1..numRows \land j \in 1..numColumns 
+		  \land \{ i \map j \} \neq entrance \dot \\
+	\t1 uniform(0,1) \leqslant pitChance? \\
+	\t1 \implies pits' = pits \union \{ i \map j\} \\
+	\forall gx, gy : \natone | \\
+	\t1 gx \in 1..numRows \land gy \in 1..numColumns \dot \\
+	\t1 gx = random(1,numRows) \land gy = random(1,numColumns) \\
+	\t1 \implies gold' = \{ gx \map gy \} \\
+	\forall wx, wy : \natone | \\
+	\t1 wx \in 1..numRows \land wy \in 1..numColumns \dot \\
+	\t1 wx = random(1,numRows) \land wy = random(1,numColumns) \\
+	\t1 \implies wumpus' = \{ wx \map wy \} \\
+	agentLocation' = entrance \\
+	agentDirection' = Left
+\end{schema}
+
+\end{document}

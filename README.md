@@ -2,38 +2,40 @@
 A small unfinished hunt the wumpus agent game/simulation
 I wrote many years ago in Python as a student.
 
-There is also the beginnings of an (incomplete) formal specification
-of the wumpus world game written in the Z formal specification language.
+The beginnings of an (incomplete) formal specification
+of the wumpus world game written in the Z formal specification language
+is also availbel. 
 You can find a PDF of this document here:
 
 - [Incomplete Wumpus World Formal Z Specification (PDF)](https://github.com/mikepsn/wumpus/blob/master/zspec/wumpus.pdf)
 
-I wrote this code back in early 2002 using (I think) Python 2.3
-as a graduate student. It was supposed to be a simple Wumpus world 
+I wrote this code back in early 2002 as a grduate student , using (I think) Python 2.3. 
+It was supposed to be a simple Wumpus world
 agent environment for conducting research into affordance theory.
-Also the basics are there, it is largely unfinished as I moved on to other
-domain at the time.
+Although the basics are there, it is largely unfinished, 
+as I moved on to working on other research at the time.
 
-What is suprising is that after all these years (2018) the code still
-runs under Python 2.7. I tested it using the Anaconda distribution under
+What is suprising is that after all these years (2002-2018) the code
+runs under Python 2.7. I tested it using the Anaconda distribution on
 Mac OS X and Windows 10.
 
-The visualisation code requires PyOpenGL and the Python bindings for GLUT. 
+The visualisation code requires PyOpenGL and the Python bindings for GLUT.
 If you have any problems with GLUT under Anaconda you can try installing
 the Python bindings to the `freeglut` library using `conda` as follows:
 
     conda install -c conda-forge freeglut
 
-As I mentioned the code was written in early 2002 before I adopted a PEP8
+As I mentioned previously, the code was written in early 2002 before I adopted a PEP8
 compliant coding style. I've long since abandoned the horrible CamelCase
-coding style in my code, but I guess its probably not worth changing this code.
+coding style in my code; but I guess its probably not worth 
+spending the effort to clean up this code. 
 
 Unfortunately there is also a mix of tabs and spaces. The code works but
 a move to all spaces and a PEP8 compliant format would be nice.
 
 I don't have any immediate plans to continue developing this, but if at some 
 stage in the future I do decide to revisit it, setting up an interface
-to OpenAI gym might be the way to go. That way it can be provided to
+to OpenAI gym might be the way to go. That way, it can be provided to
 students to try out different reinforcement learning algorithms (or
 other agent approaches).
 

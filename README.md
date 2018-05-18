@@ -6,7 +6,7 @@ There is also the beginnings of an (incomplete) formal specification
 of the wumpus world game written in the Z formal specification language.
 You can find a PDF of this document here:
 
-- [Incomplete Wumpus World Formal Z Specification (PDF)](https://github.com/mikepsn/wumpus/zspec/wumpus.pdf)
+- [Incomplete Wumpus World Formal Z Specification (PDF)](https://github.com/mikepsn/wumpus/blob/master/zspec/wumpus.pdf)
 
 I wrote this code back in early 2002 using (I think) Python 2.3
 as a graduate student. It was supposed to be a simple Wumpus world 

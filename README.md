@@ -4,7 +4,7 @@ I wrote many years ago in Python as a student.
 
 The beginnings of an (incomplete) formal specification
 of the wumpus world game written in the Z formal specification language
-is also availbel. 
+is also availble. 
 You can find a PDF of this document here:
 
 - [Incomplete Wumpus World Formal Z Specification (PDF)](https://github.com/mikepsn/wumpus/blob/master/zspec/wumpus.pdf)
